@@ -1,4 +1,4 @@
-# Maple RET6 bootloader with OTA function.
+# Maple RET6 bootloader with OTA function
 **Self Programming via WiFi**
 
 
@@ -6,6 +6,7 @@
 ## Supported boards 
 
 * Maple RET6
+* Maple Core RET6
     
 
 ## References
