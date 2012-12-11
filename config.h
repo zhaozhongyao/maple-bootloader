@@ -71,6 +71,7 @@
 /* Addresses to place user code, in RAM and in Flash builds. */
 #define USER_CODE_RAM    0x20000C00
 #define USER_CODE_FLASH  0x08005000
+#define UPDATEFLAG_ADDR  0x08025000
 
 #define VEND_ID0         0xAF
 #define VEND_ID1         0x1E

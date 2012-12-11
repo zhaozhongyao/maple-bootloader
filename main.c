@@ -60,7 +60,9 @@ int main() {
     }
   }
 
-  if (checkUserCode(USER_CODE_RAM)) {
+  if (checkUserCode(UPDATEFLAG_ADDR)) {
+    // start self programming
+  } else if (checkUserCode(USER_CODE_RAM)) {
     jumpToUser(USER_CODE_RAM);
   } else if (checkUserCode(USER_CODE_FLASH)) {
     jumpToUser(USER_CODE_FLASH);
