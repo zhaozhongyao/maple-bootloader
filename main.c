@@ -61,7 +61,12 @@ int main() {
   }
 
   if (checkUserCode(UPDATEFLAG_ADDR)) {
-    // start self programming
+    if(dfuSelfProgramming()) {
+      systemHardReset();
+    }
+    else {
+      strobePin(LED_BANK,LED,2,0x500);
+    }
   } else if (checkUserCode(USER_CODE_RAM)) {
     jumpToUser(USER_CODE_RAM);
   } else if (checkUserCode(USER_CODE_FLASH)) {

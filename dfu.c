@@ -38,6 +38,7 @@
 u32 userAppAddr = USER_CODE_RAM; /* default RAM user code location */
 DFUStatus dfuAppStatus;       /* includes state */
 bool userFlash = FALSE;
+bool selfFlash = FALSE;
 bool dfuBusy = FALSE;
 
 u8 recvBuffer[wTransferSize];
@@ -328,7 +329,7 @@ void dfuCopyBufferToExec() {
     for (i=0;i<thisBlockLen;i=i+4) {
       *userSpace++ = *(u32*)(recvBuffer+i);
     }
-  } else {
+  } else if (userFlash) {
     userSpace = (u32*)(USER_CODE_FLASH+userFirmwareLen);
 
     flashErasePage((u32)(userSpace));
@@ -337,6 +338,13 @@ void dfuCopyBufferToExec() {
       flashWriteWord(userSpace++,*(u32*)(recvBuffer+i));
     }
 
+  }
+    else {
+      userSpace = (u32*)(USER_CODE_FLASH+userFirmwareLen);
+      flashErasePage((u32)(userSpace));
+      for (i=0;i<thisBlockLen;i=i+4) {
+        flashWriteWord(userSpace++,*(u32*)(recvBuffer+i));
+    }
   }
   userFirmwareLen += thisBlockLen;
 
@@ -370,3 +378,27 @@ void dfuFinishUpload() {
   }
 }
 
+bool dfuSelfProgramming(void) {
+  u32 FirmwareLen = *(vu32*) UPDATEINFO_ADDR;
+  int i;
+  userFirmwareLen = 0;
+  while (userFirmwareLen < FirmwareLen) {
+    if ((FirmwareLen - userFirmwareLen) > wTransferSize) {
+      thisBlockLen = wTransferSize;
+    }
+    else {
+      thisBlockLen = (FirmwareLen - userFirmwareLen)%wTransferSize;
+    }
+    /* Calc thisBlock size */
+    for(i=0;i<thisBlockLen;i++) {
+      (u8*)(recvBuffer++) = *(u8*)(UPDATEFLAG_ADDR+userFirmwareLen+i);
+      /* Copy update data to recvBuffer */
+    }
+    dfuCopyBufferToExec();
+    /* Copy recvBuffer to userFlash */
+  }
+  if(userFirmwareLen >= FirmwareLen) && (FirmwareLen > 0) {
+    return true;
+  }
+  return false;
+}
